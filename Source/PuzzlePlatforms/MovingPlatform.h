@@ -31,6 +31,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	float waitTime = 3.0f;
 
+	UPROPERTY(EditAnywhere)
+	int needToActive = 0;
+
 public:
 	AMovingPlatform();
 

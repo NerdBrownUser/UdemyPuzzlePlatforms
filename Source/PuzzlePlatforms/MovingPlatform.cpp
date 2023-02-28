@@ -31,8 +31,11 @@ void AMovingPlatform::Tick(float deltaTime)
 
 	if (HasAuthority() == true)
 	{
-		if (Wait(deltaTime) == true)
-			Move(deltaTime);
+		if (needToActive <= 0)
+		{
+			if (Wait(deltaTime) == true)
+				Move(deltaTime);
+		}
 	}
 }
 
