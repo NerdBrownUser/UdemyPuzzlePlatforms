@@ -21,11 +21,11 @@ void UPuzzlePlatformsGameInstance::Host()
 	if (GEngine != nullptr)
 	{
 		GEngine->AddOnScreenDebugMessage(0, 2.0f, FColor::Green, _T("Hosting"));
-	}
 
-	if (GWorld != nullptr)
-	{
-		GWorld->ServerTravel("/Game/ThirdPerson/Maps/ThirdPersonMap?listen");
+		if (GWorld != nullptr)
+		{
+			GWorld->ServerTravel("/Game/ThirdPerson/Maps/ThirdPersonMap?listen");
+		}
 	}
 }
 
