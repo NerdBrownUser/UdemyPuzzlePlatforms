@@ -13,6 +13,9 @@ UCLASS()
 class PUZZLEPLATFORMS_API UMainMenu : public UUserWidget
 {
 	GENERATED_BODY()
+
+protected:
+	virtual bool Initialize() override;
 	
 private:
 	UPROPERTY(Meta = (BindWidget))
@@ -20,4 +23,7 @@ private:
 
 	UPROPERTY(Meta = (BindWidget))
 	class UButton* join;
+
+	UFUNCTION()
+	void HostServer();
 };
