@@ -33,10 +33,13 @@ private:
 	class UWidget* joinMenu;
 
 	UPROPERTY(Meta = (BindWidget))
+	class UEditableTextBox* inputIPAddress;
+
+	UPROPERTY(Meta = (BindWidget))
 	class UButton* joinButton;
 
 	UPROPERTY(Meta = (BindWidget))
-	class UButton* cancleButton;
+	class UButton* cancleJoinMenuButton;
 
 	class IMenuInterface* menuInterface;
 
@@ -51,6 +54,9 @@ protected:
 private:
 	UFUNCTION()
 	void HostServer();
+
+	UFUNCTION()
+	void JoinServer();
 
 	UFUNCTION()
 	void OpenJoinMenu();

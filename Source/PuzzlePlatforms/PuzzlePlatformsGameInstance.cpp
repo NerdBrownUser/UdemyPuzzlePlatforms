@@ -61,5 +61,7 @@ void UPuzzlePlatformsGameInstance::Join(const FString& ipAddress)
 		{
 			playerController->ClientTravel(ipAddress, ETravelType::TRAVEL_Absolute);
 		}
+
+		mainMenu->Deactivate();
 	}
 }

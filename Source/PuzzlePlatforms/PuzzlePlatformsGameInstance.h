@@ -32,5 +32,5 @@ public:
 	void Host() override;
 
 	UFUNCTION(Exec)
-	void Join(const FString& ipAddress);
+	void Join(const FString& ipAddress) override;
 };
