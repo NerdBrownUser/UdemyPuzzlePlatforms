@@ -15,6 +15,8 @@ class PUZZLEPLATFORMS_API UMainMenu : public UUserWidget
 	GENERATED_BODY()
 
 private:
+	class IMenuInterface* menuInterface;
+
 	UPROPERTY(Meta = (BindWidget))
 	class UWidgetSwitcher* menuSwitcher;
 
@@ -41,11 +43,22 @@ private:
 	UPROPERTY(Meta = (BindWidget))
 	class UButton* cancelJoinMenuButton;
 
-	class IMenuInterface* menuInterface;
+	/* Quit Menu */
+	UPROPERTY(Meta = (BindWidget))
+	class UWidget* quitMenu;
+
+	UPROPERTY(Meta = (BindWidget))
+	class UButton* quitButton;
+
+	UPROPERTY(Meta = (BindWidget))
+	class UButton* cancelQuitMenuButton;
 
 public:
 	void Activate(class IMenuInterface* _menuInterface);
 	void Deactivate();
+
+	UFUNCTION(BlueprintCallable)
+	void OpenQuitMenu();
 
 protected:
 	virtual bool Initialize() override;
@@ -63,4 +76,7 @@ private:
 
 	UFUNCTION()
 	void BackToMainMenu();
+
+	UFUNCTION()
+	void QuitGame();
 };

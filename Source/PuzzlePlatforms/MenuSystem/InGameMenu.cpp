@@ -46,14 +46,10 @@ void UInGameMenu::Deactivate()
 
 bool UInGameMenu::Initialize()
 {
-	UE_LOG(LogTemp, Warning, _T("Call Initialize"));
-
 	if (Super::Initialize() == false ||
 		leaveButton == nullptr ||
 		cancelInGameMenuButton == nullptr)
 		return false;
-
-	UE_LOG(LogTemp, Warning, _T("Add Dynamic"));
 
 	leaveButton->OnClicked.AddDynamic(this, &UInGameMenu::LeaveGame);
 	cancelInGameMenuButton->OnClicked.AddDynamic(this, &UInGameMenu::Close);
@@ -70,16 +66,10 @@ void UInGameMenu::NativeDestruct()
 
 void UInGameMenu::LeaveGame()
 {
-	UE_LOG(LogTemp, Warning, _T("Call Leave Game"));
-
 	if (menuInterface != nullptr)
 	{
-		UE_LOG(LogTemp, Warning, _T("Have menuInterface"));
-
 		if (leaveButton != nullptr)
 			menuInterface->Leave();
-		else
-			UE_LOG(LogTemp, Warning, _T("Don't have leaveButton"));
 	}
 }
 

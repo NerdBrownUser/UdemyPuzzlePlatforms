@@ -19,7 +19,7 @@ void UMainMenu::Activate(IMenuInterface* _menuInterface)
 
 	if (playerController != nullptr)
 	{
-		FInputModeUIOnly inputMode;
+		FInputModeGameAndUI inputMode;
 
 		bIsFocusable = true;
 		inputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
@@ -46,19 +46,32 @@ void UMainMenu::Deactivate()
 	}
 }
 
+void UMainMenu::OpenQuitMenu()
+{
+	if (menuSwitcher != nullptr)
+	{
+		if (quitMenu != nullptr)
+			menuSwitcher->SetActiveWidget(quitMenu);
+	}
+}
+
 bool UMainMenu::Initialize()
 {
 	if (Super::Initialize() == false ||
 		hostButton == nullptr ||
 		joinMenuButton == nullptr ||
 		joinButton == nullptr ||
-		cancelJoinMenuButton == nullptr)
+		cancelJoinMenuButton == nullptr ||
+		quitButton == nullptr ||
+		cancelQuitMenuButton == nullptr)
 		return false;
 
 	hostButton->OnClicked.AddDynamic(this, &UMainMenu::HostServer);
 	joinButton->OnClicked.AddDynamic(this, &UMainMenu::JoinServer);
 	joinMenuButton->OnClicked.AddDynamic(this, &UMainMenu::OpenJoinMenu);
 	cancelJoinMenuButton->OnClicked.AddDynamic(this, &UMainMenu::BackToMainMenu);
+	quitButton->OnClicked.AddDynamic(this, &UMainMenu::QuitGame);
+	cancelQuitMenuButton->OnClicked.AddDynamic(this, &UMainMenu::BackToMainMenu);
 
 	return true;
 }
@@ -105,4 +118,10 @@ void UMainMenu::BackToMainMenu()
 		if (mainMenu != nullptr)
 			menuSwitcher->SetActiveWidget(mainMenu);
 	}
+}
+
+void UMainMenu::QuitGame()
+{
+	if (menuInterface != nullptr)
+		menuInterface->QuitGame();
 }

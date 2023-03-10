@@ -39,7 +39,7 @@ public:
 
 	void Join(const FString& ipAddress) override;
 
-	UFUNCTION(BlueprintCallable, Exec)
+	UFUNCTION(BlueprintCallable)
 	void OpenInGameMenu();
 
 	UFUNCTION(Exec)
