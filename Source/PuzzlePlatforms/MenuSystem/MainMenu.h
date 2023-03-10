@@ -39,7 +39,7 @@ private:
 	class UButton* joinButton;
 
 	UPROPERTY(Meta = (BindWidget))
-	class UButton* cancleJoinMenuButton;
+	class UButton* cancelJoinMenuButton;
 
 	class IMenuInterface* menuInterface;
 

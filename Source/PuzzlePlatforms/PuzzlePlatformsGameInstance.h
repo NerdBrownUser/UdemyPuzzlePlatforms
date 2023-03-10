@@ -20,17 +20,31 @@ private:
 
 	class UMainMenu* mainMenu;
 
+	TSubclassOf<class UInGameMenu> inGameMenuClass;
+
+	class UInGameMenu* inGameMenu;
+
 public:
 	UPuzzlePlatformsGameInstance(const FObjectInitializer& ObjectInitializer);
 
 	void Init() override;
 
 	UFUNCTION(BlueprintCallable)
-	void LoadMenu();
+	void LoadMainMenu();
 
-	UFUNCTION(Exec)
+	UFUNCTION(BlueprintCallable)
+	void LoadInGameMenu();
+
 	void Host() override;
 
-	UFUNCTION(Exec)
 	void Join(const FString& ipAddress) override;
+
+	UFUNCTION(BlueprintCallable, Exec)
+	void OpenInGameMenu();
+
+	UFUNCTION(Exec)
+	void Leave() override;
+
+	UFUNCTION(Exec)
+	void QuitGame() override;
 };

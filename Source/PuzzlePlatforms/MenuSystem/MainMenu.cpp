@@ -21,7 +21,7 @@ void UMainMenu::Activate(IMenuInterface* _menuInterface)
 	{
 		FInputModeUIOnly inputMode;
 
-		inputMode.SetWidgetToFocus(TakeWidget());
+		bIsFocusable = true;
 		inputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
 
 		playerController->SetInputMode(inputMode);
@@ -52,19 +52,21 @@ bool UMainMenu::Initialize()
 		hostButton == nullptr ||
 		joinMenuButton == nullptr ||
 		joinButton == nullptr ||
-		cancleJoinMenuButton == nullptr)
+		cancelJoinMenuButton == nullptr)
 		return false;
 
 	hostButton->OnClicked.AddDynamic(this, &UMainMenu::HostServer);
 	joinButton->OnClicked.AddDynamic(this, &UMainMenu::JoinServer);
 	joinMenuButton->OnClicked.AddDynamic(this, &UMainMenu::OpenJoinMenu);
-	cancleJoinMenuButton->OnClicked.AddDynamic(this, &UMainMenu::BackToMainMenu);
+	cancelJoinMenuButton->OnClicked.AddDynamic(this, &UMainMenu::BackToMainMenu);
 
 	return true;
 }
 
 void UMainMenu::NativeDestruct()
 {
+	Deactivate();
+
 	Super::NativeDestruct();
 }
 
