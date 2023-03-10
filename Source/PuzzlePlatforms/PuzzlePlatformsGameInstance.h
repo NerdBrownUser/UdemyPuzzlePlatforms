@@ -16,7 +16,9 @@ class PUZZLEPLATFORMS_API UPuzzlePlatformsGameInstance : public UGameInstance, p
 	GENERATED_BODY()
 
 private:
-	TSubclassOf<class UUserWidget> menuClass;
+	TSubclassOf<class UMainMenu> menuClass;
+
+	class UMainMenu* mainMenu;
 
 public:
 	UPuzzlePlatformsGameInstance(const FObjectInitializer& ObjectInitializer);

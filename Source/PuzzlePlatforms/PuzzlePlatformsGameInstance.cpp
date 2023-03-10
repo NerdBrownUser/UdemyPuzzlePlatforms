@@ -5,7 +5,7 @@
 
 #include "Engine/Engine.h"
 #include "UObject/ConstructorHelpers.h"
-#include "Blueprint/UserWidget.h"
+#include "MenuSystem/MainMenu.h"
 
 UPuzzlePlatformsGameInstance::UPuzzlePlatformsGameInstance(const FObjectInitializer& ObjectInitializer)
 {
@@ -27,23 +27,10 @@ void UPuzzlePlatformsGameInstance::LoadMenu()
 {
 	if (menuClass != nullptr)
 	{
-		UUserWidget* mainMenu = CreateWidget<UUserWidget>(this, menuClass, _T("MenuClass"));
+		mainMenu = CreateWidget<UMainMenu>(this, menuClass, _T("MenuClass"));
 
-		mainMenu->AddToViewport();
-
-		auto* playerController = GetFirstLocalPlayerController();
-
-		if (playerController != nullptr)
-		{
-			FInputModeUIOnly inputMode;
-
-			inputMode.SetWidgetToFocus(mainMenu->TakeWidget());
-			inputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
-
-			playerController->SetInputMode(inputMode);
-
-			playerController->SetShowMouseCursor(true);
-		}
+		if (mainMenu != nullptr)
+			mainMenu->Activate(this);
 	}
 }
 
@@ -56,6 +43,8 @@ void UPuzzlePlatformsGameInstance::Host()
 		if (GWorld != nullptr)
 		{
 			GWorld->ServerTravel("/Game/ThirdPerson/Maps/ThirdPersonMap?listen");
+
+			mainMenu->Deactivate();
 		}
 	}
 }

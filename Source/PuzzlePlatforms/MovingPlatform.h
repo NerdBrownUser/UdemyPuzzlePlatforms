@@ -38,10 +38,8 @@ public:
 	AMovingPlatform();
 
 	void BeginPlay() override;
-
 	void Tick(float deltaTime) override;
 
 	bool Wait(float deltaTime);
-
 	void Move(float deltaTime);
 };

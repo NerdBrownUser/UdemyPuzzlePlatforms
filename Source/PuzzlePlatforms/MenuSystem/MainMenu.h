@@ -23,8 +23,13 @@ private:
 
 	class IMenuInterface* menuInterface;
 
+public:
+	void Activate(class IMenuInterface* _menuInterface);
+	void Deactivate();
+
 protected:
 	virtual bool Initialize() override;
+	void NativeDestruct() override;
 	
 private:
 	UFUNCTION()

@@ -6,6 +6,43 @@
 #include "MenuInterface.h"
 #include "Components/Button.h"
 
+void UMainMenu::Activate(IMenuInterface* _menuInterface)
+{
+	menuInterface = _menuInterface;
+
+	AddToViewport();
+
+	auto* playerController = GetWorld()->GetFirstPlayerController();
+
+	if (playerController != nullptr)
+	{
+		FInputModeUIOnly inputMode;
+
+		inputMode.SetWidgetToFocus(TakeWidget());
+		inputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+
+		playerController->SetInputMode(inputMode);
+		playerController->SetShowMouseCursor(true);
+	}
+}
+
+void UMainMenu::Deactivate()
+{
+	menuInterface = nullptr;
+
+	RemoveFromViewport();
+
+	auto* playerController = GetWorld()->GetFirstPlayerController();
+
+	if (playerController != nullptr)
+	{
+		FInputModeGameOnly inputMode;
+
+		playerController->SetInputMode(inputMode);
+		playerController->SetShowMouseCursor(false);
+	}
+}
+
 bool UMainMenu::Initialize()
 {
 	if (Super::Initialize() == false || host == nullptr)
@@ -13,17 +50,16 @@ bool UMainMenu::Initialize()
 
 	host->OnClicked.AddDynamic(this, &UMainMenu::HostServer);
 
-	menuInterface = GetGameInstance<IMenuInterface>();
-
 	return true;
+}
+
+void UMainMenu::NativeDestruct()
+{
+	Super::NativeDestruct();
 }
 
 void UMainMenu::HostServer()
 {
-	UE_LOG(LogTemp, Warning, _T("Server hosting"));
-
 	if (menuInterface != nullptr)
-	{
 		menuInterface->Host();
-	}
 }
