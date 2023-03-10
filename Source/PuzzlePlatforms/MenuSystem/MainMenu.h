@@ -16,10 +16,27 @@ class PUZZLEPLATFORMS_API UMainMenu : public UUserWidget
 
 private:
 	UPROPERTY(Meta = (BindWidget))
-		class UButton* host;
+	class UWidgetSwitcher* menuSwitcher;
+
+	/* Main Menu */
+	UPROPERTY(Meta = (BindWidget))
+	class UWidget* mainMenu;
 
 	UPROPERTY(Meta = (BindWidget))
-		class UButton* join;
+	class UButton* hostButton;
+
+	UPROPERTY(Meta = (BindWidget))
+	class UButton* joinMenuButton;
+
+	/* Join Menu */
+	UPROPERTY(Meta = (BindWidget))
+	class UWidget* joinMenu;
+
+	UPROPERTY(Meta = (BindWidget))
+	class UButton* joinButton;
+
+	UPROPERTY(Meta = (BindWidget))
+	class UButton* cancleButton;
 
 	class IMenuInterface* menuInterface;
 
@@ -34,4 +51,10 @@ protected:
 private:
 	UFUNCTION()
 	void HostServer();
+
+	UFUNCTION()
+	void OpenJoinMenu();
+
+	UFUNCTION()
+	void BackToMainMenu();
 };
