@@ -25,6 +25,8 @@ private:
 
 	IOnlineSessionPtr sessionInterface;
 
+	TSharedPtr<FOnlineSessionSearch> sessionSearch;
+
 public:
 	UPuzzlePlatformsGameInstance(const FObjectInitializer& ObjectInitializer);
 
@@ -49,9 +51,11 @@ public:
 	UFUNCTION(Exec)
 	void QuitGame() override;
 
-	void OnCreateSessionCompleted(FName sessionName, bool isSuccess);
+	void OnCreateSessionComplete(FName sessionName, bool isSuccess);
 
-	void OnDestroySessionCompleted(FName sessionName, bool isSuccess);
+	void OnDestroySessionComplete(FName sessionName, bool isSuccess);
+
+	void OnFindSessionsComplete(bool isSuccess);
 
 	void CreateSession(FName sessionName);
 };

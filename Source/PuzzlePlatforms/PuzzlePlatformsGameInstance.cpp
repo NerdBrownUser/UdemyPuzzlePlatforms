@@ -41,8 +41,20 @@ void UPuzzlePlatformsGameInstance::Init()
 		sessionInterface = oss->GetSessionInterface();
 
 		if (sessionInterface.IsValid() == true)
-			sessionInterface->OnCreateSessionCompleteDelegates.AddUObject(this, &UPuzzlePlatformsGameInstance::OnCreateSessionCompleted);
-			sessionInterface->OnDestroySessionCompleteDelegates.AddUObject(this, &UPuzzlePlatformsGameInstance::OnDestroySessionCompleted);
+		{
+			sessionInterface->OnCreateSessionCompleteDelegates.AddUObject(this, &UPuzzlePlatformsGameInstance::OnCreateSessionComplete);
+			sessionInterface->OnDestroySessionCompleteDelegates.AddUObject(this, &UPuzzlePlatformsGameInstance::OnDestroySessionComplete);
+			sessionInterface->OnFindSessionsCompleteDelegates.AddUObject(this, &UPuzzlePlatformsGameInstance::OnFindSessionsComplete);
+
+			sessionSearch = MakeShareable(new FOnlineSessionSearch);
+
+			if (sessionSearch.IsValid() == true)
+			{
+				sessionSearch->bIsLanQuery = true;
+
+				sessionInterface->FindSessions(0, sessionSearch.ToSharedRef());
+			}
+		}
 	}
 	else
 	{
@@ -146,7 +158,7 @@ void UPuzzlePlatformsGameInstance::QuitGame()
 	}
 }
 
-void UPuzzlePlatformsGameInstance::OnCreateSessionCompleted(FName sessionName, bool isSuccess)
+void UPuzzlePlatformsGameInstance::OnCreateSessionComplete(FName sessionName, bool isSuccess)
 {
 	if (isSuccess != true)
 		return;
@@ -162,9 +174,32 @@ void UPuzzlePlatformsGameInstance::OnCreateSessionCompleted(FName sessionName, b
 	}
 }
 
-void UPuzzlePlatformsGameInstance::OnDestroySessionCompleted(FName sessionName, bool isSuccess)
+void UPuzzlePlatformsGameInstance::OnDestroySessionComplete(FName sessionName, bool isSuccess)
 {
 
+}
+
+void UPuzzlePlatformsGameInstance::OnFindSessionsComplete(bool isSuccess)
+{
+	if (isSuccess == true && sessionSearch.IsValid() == true)
+	{
+		UE_LOG(LogTemp, Warning, _T("Found Session"));
+
+		for (auto& result : sessionSearch->SearchResults)
+		{
+			FString sessionData = "";
+
+			sessionData += result.Session.GetSessionIdStr() + "\n";
+			sessionData += result.Session.OwningUserId->ToString() + "\n";
+			sessionData += result.Session.OwningUserName + "\n";
+
+			UE_LOG(LogTemp, Warning, _T("%s"), *sessionData);
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, _T("Found not Session"));
+	}
 }
 
 void UPuzzlePlatformsGameInstance::CreateSession(FName sessionName)
@@ -172,6 +207,10 @@ void UPuzzlePlatformsGameInstance::CreateSession(FName sessionName)
 	if (sessionInterface.IsValid() == true)
 	{
 		FOnlineSessionSettings sessionSettings;
+		sessionSettings.bIsLANMatch = true;
+		sessionSettings.bShouldAdvertise = true;
+		sessionSettings.NumPublicConnections = 2;
+
 		sessionInterface->CreateSession(0, sessionName, sessionSettings);
 	}
 }
