@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
 #include "MenuSystem/MenuInterface.h"
+#include "Interfaces/OnlineSessionInterface.h"
 #include "PuzzlePlatformsGameInstance.generated.h"
 
 /**
@@ -17,12 +18,12 @@ class PUZZLEPLATFORMS_API UPuzzlePlatformsGameInstance : public UGameInstance, p
 
 private:
 	TSubclassOf<class UMainMenu> menuClass;
-
 	class UMainMenu* mainMenu;
 
 	TSubclassOf<class UInGameMenu> inGameMenuClass;
-
 	class UInGameMenu* inGameMenu;
+
+	IOnlineSessionPtr sessionInterface;
 
 public:
 	UPuzzlePlatformsGameInstance(const FObjectInitializer& ObjectInitializer);
@@ -47,4 +48,10 @@ public:
 
 	UFUNCTION(Exec)
 	void QuitGame() override;
+
+	void OnCreateSessionCompleted(FName sessionName, bool isSuccess);
+
+	void OnDestroySessionCompleted(FName sessionName, bool isSuccess);
+
+	void CreateSession(FName sessionName);
 };
