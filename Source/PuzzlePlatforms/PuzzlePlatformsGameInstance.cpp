@@ -47,13 +47,6 @@ void UPuzzlePlatformsGameInstance::Init()
 			sessionInterface->OnFindSessionsCompleteDelegates.AddUObject(this, &UPuzzlePlatformsGameInstance::OnFindSessionsComplete);
 
 			sessionSearch = MakeShareable(new FOnlineSessionSearch);
-
-			if (sessionSearch.IsValid() == true)
-			{
-				sessionSearch->bIsLanQuery = true;
-
-				sessionInterface->FindSessions(0, sessionSearch.ToSharedRef());
-			}
 		}
 	}
 	else
@@ -121,6 +114,16 @@ void UPuzzlePlatformsGameInstance::Join(const FString& ipAddress)
 	}
 }
 
+void UPuzzlePlatformsGameInstance::RefreshServerList()
+{
+	if (sessionSearch.IsValid() == true)
+	{
+		sessionSearch->bIsLanQuery = true;
+
+		sessionInterface->FindSessions(0, sessionSearch.ToSharedRef());
+	}
+}
+
 void UPuzzlePlatformsGameInstance::OpenInGameMenu()
 {
 	if (GEngine != nullptr)
@@ -185,15 +188,14 @@ void UPuzzlePlatformsGameInstance::OnFindSessionsComplete(bool isSuccess)
 	{
 		UE_LOG(LogTemp, Warning, _T("Found Session"));
 
-		for (auto& result : sessionSearch->SearchResults)
+		if (mainMenu != nullptr)
 		{
-			FString sessionData = "";
+			mainMenu->ClearServerList();
 
-			sessionData += result.Session.GetSessionIdStr() + "\n";
-			sessionData += result.Session.OwningUserId->ToString() + "\n";
-			sessionData += result.Session.OwningUserName + "\n";
-
-			UE_LOG(LogTemp, Warning, _T("%s"), *sessionData);
+			for (auto& result : sessionSearch->SearchResults)
+			{
+				mainMenu->AddServerRow(result.GetSessionIdStr());
+			}
 		}
 	}
 	else

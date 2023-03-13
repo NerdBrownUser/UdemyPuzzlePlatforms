@@ -34,11 +34,16 @@ private:
 	UPROPERTY(Meta = (BindWidget))
 	class UWidget* joinMenu;
 
+	TSubclassOf<class UServerRow> serverRowClass;
+
 	UPROPERTY(Meta = (BindWidget))
-	class UEditableTextBox* inputIPAddress;
+	class UScrollBox* serverList;
 
 	UPROPERTY(Meta = (BindWidget))
 	class UButton* joinButton;
+
+	UPROPERTY(Meta = (BindWidget))
+	class UButton* refreshButton;
 
 	UPROPERTY(Meta = (BindWidget))
 	class UButton* cancelJoinMenuButton;
@@ -54,11 +59,19 @@ private:
 	class UButton* cancelQuitMenuButton;
 
 public:
+	UMainMenu(const FObjectInitializer& ObjectInitializer);
+
 	void Activate(class IMenuInterface* _menuInterface);
 	void Deactivate();
 
 	UFUNCTION(BlueprintCallable)
 	void OpenQuitMenu();
+
+	UFUNCTION()
+	void AddServerRow(const FString& serverName);
+
+	UFUNCTION()
+	void ClearServerList();
 
 protected:
 	virtual bool Initialize() override;
@@ -73,6 +86,9 @@ private:
 
 	UFUNCTION()
 	void OpenJoinMenu();
+
+	UFUNCTION()
+	void RefreshServerList();
 
 	UFUNCTION()
 	void BackToMainMenu();

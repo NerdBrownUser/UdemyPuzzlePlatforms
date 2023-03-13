@@ -26,6 +26,8 @@ public:
 
 	virtual void Join(const FString& ipAddress) abstract;
 
+	virtual void RefreshServerList() abstract;
+
 	virtual void Leave() abstract;
 
 	virtual void QuitGame() abstract;

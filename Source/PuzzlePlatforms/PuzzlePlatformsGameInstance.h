@@ -42,6 +42,8 @@ public:
 
 	void Join(const FString& ipAddress) override;
 
+	void RefreshServerList() override;
+
 	UFUNCTION(BlueprintCallable)
 	void OpenInGameMenu();
 

@@ -3,11 +3,23 @@
 
 #include "MainMenu.h"
 
-#include "MenuInterface.h"
+#include "UObject/ConstructorHelpers.h"
 
 #include "Components/Button.h"
 #include "Components/WidgetSwitcher.h"
-#include "Components/EditableTextBox.h"
+#include "Components/ScrollBox.h"
+#include "Components/TextBlock.h"
+
+#include "ServerRow.h"
+#include "MenuInterface.h"
+
+UMainMenu::UMainMenu(const FObjectInitializer& ObjectInitializer)
+	: UUserWidget(ObjectInitializer)
+{
+	static ConstructorHelpers::FClassFinder<UUserWidget> serverRowBPClass(TEXT("/Game/MenuSystem/WBP_ServerRow"));
+	if (serverRowBPClass.Class != nullptr)
+		serverRowClass = serverRowBPClass.Class;
+}
 
 void UMainMenu::Activate(IMenuInterface* _menuInterface)
 {
@@ -55,20 +67,42 @@ void UMainMenu::OpenQuitMenu()
 	}
 }
 
+void UMainMenu::AddServerRow(const FString& serverName)
+{
+	if (serverList != nullptr && serverRowClass != nullptr)
+	{
+		UServerRow* newServer = CreateWidget<UServerRow>(this, serverRowClass);
+
+		newServer->serverName->SetText(FText::FromString(serverName));
+
+		serverList->AddChild(newServer);
+	}
+}
+
+void UMainMenu::ClearServerList()
+{
+	if (serverList != nullptr)
+	{
+		serverList->ClearChildren();
+	}
+}
+
 bool UMainMenu::Initialize()
 {
 	if (Super::Initialize() == false ||
 		hostButton == nullptr ||
 		joinMenuButton == nullptr ||
 		joinButton == nullptr ||
+		refreshButton == nullptr ||
 		cancelJoinMenuButton == nullptr ||
 		quitButton == nullptr ||
 		cancelQuitMenuButton == nullptr)
 		return false;
 
 	hostButton->OnClicked.AddDynamic(this, &UMainMenu::HostServer);
-	joinButton->OnClicked.AddDynamic(this, &UMainMenu::JoinServer);
 	joinMenuButton->OnClicked.AddDynamic(this, &UMainMenu::OpenJoinMenu);
+	joinButton->OnClicked.AddDynamic(this, &UMainMenu::JoinServer);
+	refreshButton->OnClicked.AddDynamic(this, &UMainMenu::RefreshServerList);
 	cancelJoinMenuButton->OnClicked.AddDynamic(this, &UMainMenu::BackToMainMenu);
 	quitButton->OnClicked.AddDynamic(this, &UMainMenu::QuitGame);
 	cancelQuitMenuButton->OnClicked.AddDynamic(this, &UMainMenu::BackToMainMenu);
@@ -93,12 +127,7 @@ void UMainMenu::JoinServer()
 {
 	if (menuInterface != nullptr)
 	{
-		if (inputIPAddress != nullptr)
-		{
-			const auto& ip = inputIPAddress->GetText().ToString();
 
-			menuInterface->Join(ip);
-		}
 	}
 }
 
@@ -107,8 +136,18 @@ void UMainMenu::OpenJoinMenu()
 	if (menuSwitcher != nullptr)
 	{
 		if (joinMenu != nullptr)
+		{
+			menuInterface->RefreshServerList();
+
 			menuSwitcher->SetActiveWidget(joinMenu);
+		}
 	}
+}
+
+void UMainMenu::RefreshServerList()
+{
+	if (menuInterface != nullptr)
+		menuInterface->RefreshServerList();
 }
 
 void UMainMenu::BackToMainMenu()
