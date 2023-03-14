@@ -108,23 +108,15 @@ void UPuzzlePlatformsGameInstance::Join(uint32 index)
 		return;
 
 	sessionInterface->JoinSession(0, SESSION_NAME, sessionSearch->SearchResults[index]);
-
-	if (GEngine != nullptr)
-	{
-		//GEngine->AddOnScreenDebugMessage(0, 2.0f, FColor::Green, FString::Printf(_T("Joining %s"), *ipAddress));
-
-		//auto* playerController = GetFirstLocalPlayerController();
-
-		//if (playerController != nullptr)
-		//	playerController->ClientTravel(ipAddress, ETravelType::TRAVEL_Absolute);
-	}
 }
 
 void UPuzzlePlatformsGameInstance::RefreshServerList()
 {
 	if (sessionSearch.IsValid() == true)
 	{
-		sessionSearch->bIsLanQuery = true;
+		//sessionSearch->bIsLanQuery = true;
+		sessionSearch->MaxSearchResults = 100;
+		sessionSearch->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
 
 		sessionInterface->FindSessions(0, sessionSearch.ToSharedRef());
 	}
@@ -219,6 +211,8 @@ void UPuzzlePlatformsGameInstance::OnJoinSessionComplete(FName sessionName, EOnJ
 		if (sessionInterface->GetResolvedConnectString(sessionName, connectInfo) != true)
 			return;
 
+		UE_LOG(LogTemp, Warning, _T("%s"), *connectInfo);
+
 		auto* playerController = GetFirstLocalPlayerController();
 
 		if (playerController != nullptr)
@@ -231,9 +225,11 @@ void UPuzzlePlatformsGameInstance::CreateSession(FName sessionName)
 	if (sessionInterface.IsValid() == true)
 	{
 		FOnlineSessionSettings sessionSettings;
-		sessionSettings.bIsLANMatch = true;
+		sessionSettings.bIsLANMatch = false;
+		sessionSettings.bUsesPresence = true;
 		sessionSettings.bShouldAdvertise = true;
 		sessionSettings.NumPublicConnections = 2;
+		sessionSettings.bUseLobbiesIfAvailable = true;
 
 		sessionInterface->CreateSession(0, sessionName, sessionSettings);
 	}
