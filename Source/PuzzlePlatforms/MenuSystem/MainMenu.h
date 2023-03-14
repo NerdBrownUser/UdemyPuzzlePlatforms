@@ -58,6 +58,8 @@ private:
 	UPROPERTY(Meta = (BindWidget))
 	class UButton* cancelQuitMenuButton;
 
+	TOptional<uint32> selectedIndex;
+
 public:
 	UMainMenu(const FObjectInitializer& ObjectInitializer);
 
@@ -72,6 +74,8 @@ public:
 
 	UFUNCTION()
 	void ClearServerList();
+
+	void SelectIndex(uint32 index);
 
 protected:
 	virtual bool Initialize() override;

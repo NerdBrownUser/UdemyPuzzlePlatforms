@@ -24,7 +24,7 @@ class PUZZLEPLATFORMS_API IMenuInterface
 public:
 	virtual void Host() abstract;
 
-	virtual void Join(const FString& ipAddress) abstract;
+	virtual void Join(uint32 index) abstract;
 
 	virtual void RefreshServerList() abstract;
 

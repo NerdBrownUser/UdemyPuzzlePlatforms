@@ -40,7 +40,7 @@ public:
 
 	void Host() override;
 
-	void Join(const FString& ipAddress) override;
+	void Join(uint32 index) override;
 
 	void RefreshServerList() override;
 
@@ -54,10 +54,9 @@ public:
 	void QuitGame() override;
 
 	void OnCreateSessionComplete(FName sessionName, bool isSuccess);
-
 	void OnDestroySessionComplete(FName sessionName, bool isSuccess);
-
 	void OnFindSessionsComplete(bool isSuccess);
+	void OnJoinSessionComplete(FName sessionName, EOnJoinSessionCompleteResult::Type result);
 
 	void CreateSession(FName sessionName);
 };

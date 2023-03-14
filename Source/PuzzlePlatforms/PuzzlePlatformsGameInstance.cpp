@@ -45,6 +45,7 @@ void UPuzzlePlatformsGameInstance::Init()
 			sessionInterface->OnCreateSessionCompleteDelegates.AddUObject(this, &UPuzzlePlatformsGameInstance::OnCreateSessionComplete);
 			sessionInterface->OnDestroySessionCompleteDelegates.AddUObject(this, &UPuzzlePlatformsGameInstance::OnDestroySessionComplete);
 			sessionInterface->OnFindSessionsCompleteDelegates.AddUObject(this, &UPuzzlePlatformsGameInstance::OnFindSessionsComplete);
+			sessionInterface->OnJoinSessionCompleteDelegates.AddUObject(this, &UPuzzlePlatformsGameInstance::OnJoinSessionComplete);
 
 			sessionSearch = MakeShareable(new FOnlineSessionSearch);
 		}
@@ -101,16 +102,21 @@ void UPuzzlePlatformsGameInstance::Host()
 	}
 }
 
-void UPuzzlePlatformsGameInstance::Join(const FString& ipAddress)
+void UPuzzlePlatformsGameInstance::Join(uint32 index)
 {
+	if (sessionInterface.IsValid() != true || sessionSearch.IsValid() != true)
+		return;
+
+	sessionInterface->JoinSession(0, SESSION_NAME, sessionSearch->SearchResults[index]);
+
 	if (GEngine != nullptr)
 	{
-		GEngine->AddOnScreenDebugMessage(0, 2.0f, FColor::Green, FString::Printf(_T("Joining %s"), *ipAddress));
+		//GEngine->AddOnScreenDebugMessage(0, 2.0f, FColor::Green, FString::Printf(_T("Joining %s"), *ipAddress));
 
-		auto* playerController = GetFirstLocalPlayerController();
+		//auto* playerController = GetFirstLocalPlayerController();
 
-		if (playerController != nullptr)
-			playerController->ClientTravel(ipAddress, ETravelType::TRAVEL_Absolute);
+		//if (playerController != nullptr)
+		//	playerController->ClientTravel(ipAddress, ETravelType::TRAVEL_Absolute);
 	}
 }
 
@@ -201,6 +207,22 @@ void UPuzzlePlatformsGameInstance::OnFindSessionsComplete(bool isSuccess)
 	else
 	{
 		UE_LOG(LogTemp, Warning, _T("Found not Session"));
+	}
+}
+
+void UPuzzlePlatformsGameInstance::OnJoinSessionComplete(FName sessionName, EOnJoinSessionCompleteResult::Type result)
+{
+	if (sessionInterface.IsValid() == true)
+	{
+		FString connectInfo;
+
+		if (sessionInterface->GetResolvedConnectString(sessionName, connectInfo) != true)
+			return;
+
+		auto* playerController = GetFirstLocalPlayerController();
+
+		if (playerController != nullptr)
+			playerController->ClientTravel(connectInfo, ETravelType::TRAVEL_Absolute);
 	}
 }
 
