@@ -192,7 +192,14 @@ void UPuzzlePlatformsGameInstance::OnFindSessionsComplete(bool isSuccess)
 
 			for (auto& result : sessionSearch->SearchResults)
 			{
-				mainMenu->AddServerRow(result.GetSessionIdStr());
+				FServerData data;
+
+				data.name = result.GetSessionIdStr();
+				data.currentPlayers = 0;
+				data.maxPlayers = result.Session.NumOpenPublicConnections;
+				data.hostUserName = result.Session.OwningUserName;
+
+				mainMenu->AddServerRow(data);
 			}
 		}
 	}
@@ -224,8 +231,11 @@ void UPuzzlePlatformsGameInstance::CreateSession(FName sessionName)
 {
 	if (sessionInterface.IsValid() == true)
 	{
+		auto* oss = IOnlineSubsystem::Get();
+
 		FOnlineSessionSettings sessionSettings;
-		sessionSettings.bIsLANMatch = false;
+
+		sessionSettings.bIsLANMatch = oss->GetSubsystemName() == "NULL";
 		sessionSettings.bUsesPresence = true;
 		sessionSettings.bShouldAdvertise = true;
 		sessionSettings.NumPublicConnections = 2;

@@ -22,12 +22,22 @@ private:
 	UPROPERTY(Meta = (BindWidget))
 	class UButton* rowButton;
 
+	UPROPERTY(Meta = (BindWidget))
+	class UTextBlock* playerCounts;
+
 public:
 	UPROPERTY(Meta = (BindWidget))
 	class UTextBlock* serverName;
 
+	UPROPERTY(Meta = (BindWidget))
+	class UTextBlock* hostUserName;
+
 public:
 	void SetParentWidget(class UMainMenu* _parent, uint32 _index);
+
+	void ChangeTextColor(float r, float g, float b, float a);
+
+	void SetPlayerCounts(uint16 current, uint16 max);
 
 protected:
 	virtual bool Initialize() override;

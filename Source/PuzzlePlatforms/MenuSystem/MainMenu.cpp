@@ -67,13 +67,15 @@ void UMainMenu::OpenQuitMenu()
 	}
 }
 
-void UMainMenu::AddServerRow(const FString& serverName)
+void UMainMenu::AddServerRow(const FServerData& serverData)
 {
 	if (serverList != nullptr && serverRowClass != nullptr)
 	{
 		UServerRow* newServer = CreateWidget<UServerRow>(this, serverRowClass);
 
-		newServer->serverName->SetText(FText::FromString(serverName));
+		newServer->serverName->SetText(FText::FromString(serverData.name));
+		newServer->hostUserName->SetText(FText::FromString(serverData.hostUserName));
+		newServer->SetPlayerCounts(serverData.currentPlayers, serverData.maxPlayers);
 		newServer->SetParentWidget(this, serverList->GetChildrenCount());
 
 		serverList->AddChild(newServer);
@@ -84,12 +86,27 @@ void UMainMenu::ClearServerList()
 {
 	if (serverList != nullptr)
 	{
+		selectedIndex.Reset();
+
 		serverList->ClearChildren();
 	}
 }
 
 void UMainMenu::SelectIndex(uint32 index)
 {
+	if (selectedIndex.IsSet() == true)
+	{
+		auto* child = Cast<UServerRow>(serverList->GetChildAt(selectedIndex.GetValue()));
+
+		if (child != nullptr)
+			child->ChangeTextColor(1.0f, 1.0f, 1.0f, 1.0f);
+	}
+
+	auto* selectedChild = Cast<UServerRow>(serverList->GetChildAt(index));
+
+	if (selectedChild != nullptr)
+		selectedChild->ChangeTextColor(0.0f, 1.0f, 0.0f, 1.0f);
+
 	selectedIndex = index;
 
 	UE_LOG(LogTemp, Warning, _T("Selected index is %d"), selectedIndex.GetValue());

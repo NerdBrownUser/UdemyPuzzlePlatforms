@@ -6,6 +6,17 @@
 #include "Blueprint/UserWidget.h"
 #include "MainMenu.generated.h"
 
+USTRUCT()
+struct FServerData
+{
+	GENERATED_BODY()
+
+	FString name;
+	uint16 currentPlayers;
+	uint16 maxPlayers;
+	FString hostUserName;
+};
+
 /**
  * 
  */
@@ -70,7 +81,7 @@ public:
 	void OpenQuitMenu();
 
 	UFUNCTION()
-	void AddServerRow(const FString& serverName);
+	void AddServerRow(const FServerData& serverData);
 
 	UFUNCTION()
 	void ClearServerList();
