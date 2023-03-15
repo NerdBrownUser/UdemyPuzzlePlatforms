@@ -1,0 +1,1 @@
+start cmd /c ""D:\EpicGames\UE_5.1\Engine\Binaries\Win64\UnrealEditor.exe" "D:\Udemy\Unreal\PuzzlePlatforms\PuzzlePlatforms.uproject" %*"
