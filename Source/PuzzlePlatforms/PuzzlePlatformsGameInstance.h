@@ -38,7 +38,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void LoadInGameMenu();
 
-	void Host() override;
+	void Host(const FText& lobbyName) override;
 
 	void Join(uint32 index) override;
 

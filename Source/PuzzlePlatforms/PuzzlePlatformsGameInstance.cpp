@@ -73,11 +73,11 @@ void UPuzzlePlatformsGameInstance::LoadInGameMenu()
 		inGameMenu = CreateWidget<UInGameMenu>(this, inGameMenuClass, _T("InGameMenuClass"));
 }
 
-void UPuzzlePlatformsGameInstance::Host()
+void UPuzzlePlatformsGameInstance::Host(const FText& lobbyName)
 {
 	if (sessionInterface.IsValid() == true)
 	{
-		auto* ExistingSession = sessionInterface->GetNamedSession(SESSION_NAME);
+		auto* ExistingSession = sessionInterface->GetNamedSession(*lobbyName.ToString());
 
 		if (ExistingSession != nullptr)
 		{
@@ -93,11 +93,11 @@ void UPuzzlePlatformsGameInstance::Host()
 					CreateSession(sessionName);
 				});
 
-			sessionInterface->DestroySession(SESSION_NAME, destroyDelegate);
+			sessionInterface->DestroySession(*lobbyName.ToString(), destroyDelegate);
 		}
 		else
 		{
-			CreateSession(SESSION_NAME);
+			CreateSession(*lobbyName.ToString());
 		}
 	}
 }
@@ -194,10 +194,16 @@ void UPuzzlePlatformsGameInstance::OnFindSessionsComplete(bool isSuccess)
 			{
 				FServerData data;
 
-				data.name = result.GetSessionIdStr();
-				data.currentPlayers = 0;
-				data.maxPlayers = result.Session.NumOpenPublicConnections;
+				data.maxPlayers = result.Session.SessionSettings.NumPublicConnections;
+				data.currentPlayers = data.maxPlayers - result.Session.NumOpenPublicConnections;
 				data.hostUserName = result.Session.OwningUserName;
+
+				FString userData;
+
+				if (result.Session.SessionSettings.Get<FString>(_T("LobbyName"), userData))
+				{
+					data.name = *userData;
+				}
 
 				mainMenu->AddServerRow(data);
 			}
@@ -240,6 +246,7 @@ void UPuzzlePlatformsGameInstance::CreateSession(FName sessionName)
 		sessionSettings.bShouldAdvertise = true;
 		sessionSettings.NumPublicConnections = 2;
 		sessionSettings.bUseLobbiesIfAvailable = true;
+		sessionSettings.Set(_T("LobbyName"), sessionName.ToString(), EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
 
 		sessionInterface->CreateSession(0, sessionName, sessionSettings);
 	}

@@ -9,6 +9,7 @@
 #include "Components/WidgetSwitcher.h"
 #include "Components/ScrollBox.h"
 #include "Components/TextBlock.h"
+#include "Components/EditableText.h"
 
 #include "ServerRow.h"
 #include "MenuInterface.h"
@@ -117,6 +118,9 @@ bool UMainMenu::Initialize()
 	if (Super::Initialize() == false ||
 		hostButton == nullptr ||
 		joinMenuButton == nullptr ||
+		quitMenuButton == nullptr ||
+		confirmButton == nullptr ||
+		cancelHostMenuButton == nullptr ||
 		joinButton == nullptr ||
 		refreshButton == nullptr ||
 		cancelJoinMenuButton == nullptr ||
@@ -124,8 +128,11 @@ bool UMainMenu::Initialize()
 		cancelQuitMenuButton == nullptr)
 		return false;
 
-	hostButton->OnClicked.AddDynamic(this, &UMainMenu::HostServer);
+	hostButton->OnClicked.AddDynamic(this, &UMainMenu::OpenHostMenu);
 	joinMenuButton->OnClicked.AddDynamic(this, &UMainMenu::OpenJoinMenu);
+	quitMenuButton->OnClicked.AddDynamic(this, &UMainMenu::OpenQuitMenu);
+	confirmButton->OnClicked.AddDynamic(this, &UMainMenu::HostServer);
+	cancelHostMenuButton->OnClicked.AddDynamic(this, &UMainMenu::BackToMainMenu);
 	joinButton->OnClicked.AddDynamic(this, &UMainMenu::JoinServer);
 	refreshButton->OnClicked.AddDynamic(this, &UMainMenu::RefreshServerList);
 	cancelJoinMenuButton->OnClicked.AddDynamic(this, &UMainMenu::BackToMainMenu);
@@ -145,7 +152,10 @@ void UMainMenu::NativeDestruct()
 void UMainMenu::HostServer()
 {
 	if (menuInterface != nullptr)
-		menuInterface->Host();
+	{
+		if (lobbyName->GetText().IsEmpty() != true)
+			menuInterface->Host(lobbyName->GetText());
+	}
 }
 
 void UMainMenu::JoinServer()
@@ -160,6 +170,15 @@ void UMainMenu::JoinServer()
 	else
 	{
 		UE_LOG(LogTemp, Warning, _T("Selected index not set"));
+	}
+}
+
+void UMainMenu::OpenHostMenu()
+{
+	if (menuSwitcher != nullptr)
+	{
+		if (hostMenu != nullptr)
+			menuSwitcher->SetActiveWidget(hostMenu);
 	}
 }
 

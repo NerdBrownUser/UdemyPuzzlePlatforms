@@ -22,7 +22,7 @@ class PUZZLEPLATFORMS_API IMenuInterface
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	virtual void Host() abstract;
+	virtual void Host(const FText& lobbyName) abstract;
 
 	virtual void Join(uint32 index) abstract;
 
