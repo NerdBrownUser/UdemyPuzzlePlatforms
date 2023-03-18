@@ -12,25 +12,23 @@
 #include "MenuSystem/MainMenu.h"
 #include "MenuSystem/InGameMenu.h"
 
-const static FName SESSION_NAME = _T("My Session Game");
-
 UPuzzlePlatformsGameInstance::UPuzzlePlatformsGameInstance(const FObjectInitializer& ObjectInitializer)
 {
 	static ConstructorHelpers::FClassFinder<UUserWidget> menuBPClass(TEXT("/Game/MenuSystem/WBP_MainMenu"));
 	if (menuBPClass.Class != nullptr)
-		menuClass = menuBPClass.Class;
+		MenuClass = menuBPClass.Class;
 
 	static ConstructorHelpers::FClassFinder<UUserWidget> inGameMenuBPClass(TEXT("/Game/MenuSystem/WBP_InGameMenu"));
 	if (inGameMenuBPClass.Class != nullptr)
-		inGameMenuClass = inGameMenuBPClass.Class;
+		InGameMenuClass = inGameMenuBPClass.Class;
 }
 
 void UPuzzlePlatformsGameInstance::Init()
 {
 	Super::Init();
 
-	UE_LOG(LogTemp, Warning, _T("Found class %s"), *menuClass->GetName());
-	UE_LOG(LogTemp, Warning, _T("Found class %s"), *inGameMenuClass->GetName());
+	UE_LOG(LogTemp, Warning, _T("Found class %s"), *MenuClass->GetName());
+	UE_LOG(LogTemp, Warning, _T("Found class %s"), *InGameMenuClass->GetName());
 
 	auto* oss = IOnlineSubsystem::Get();
 
@@ -38,16 +36,16 @@ void UPuzzlePlatformsGameInstance::Init()
 	{
 		UE_LOG(LogTemp, Warning, _T("OS : %s"), *oss->GetSubsystemName().ToString());
 
-		sessionInterface = oss->GetSessionInterface();
+		SessionInterface = oss->GetSessionInterface();
 
-		if (sessionInterface.IsValid() == true)
+		if (SessionInterface.IsValid() == true)
 		{
-			sessionInterface->OnCreateSessionCompleteDelegates.AddUObject(this, &UPuzzlePlatformsGameInstance::OnCreateSessionComplete);
-			sessionInterface->OnDestroySessionCompleteDelegates.AddUObject(this, &UPuzzlePlatformsGameInstance::OnDestroySessionComplete);
-			sessionInterface->OnFindSessionsCompleteDelegates.AddUObject(this, &UPuzzlePlatformsGameInstance::OnFindSessionsComplete);
-			sessionInterface->OnJoinSessionCompleteDelegates.AddUObject(this, &UPuzzlePlatformsGameInstance::OnJoinSessionComplete);
+			SessionInterface->OnCreateSessionCompleteDelegates.AddUObject(this, &UPuzzlePlatformsGameInstance::OnCreateSessionComplete);
+			SessionInterface->OnDestroySessionCompleteDelegates.AddUObject(this, &UPuzzlePlatformsGameInstance::OnDestroySessionComplete);
+			SessionInterface->OnFindSessionsCompleteDelegates.AddUObject(this, &UPuzzlePlatformsGameInstance::OnFindSessionsComplete);
+			SessionInterface->OnJoinSessionCompleteDelegates.AddUObject(this, &UPuzzlePlatformsGameInstance::OnJoinSessionComplete);
 
-			sessionSearch = MakeShareable(new FOnlineSessionSearch);
+			SessionSearch = MakeShareable(new FOnlineSessionSearch);
 		}
 	}
 	else
@@ -58,26 +56,26 @@ void UPuzzlePlatformsGameInstance::Init()
 
 void UPuzzlePlatformsGameInstance::LoadMainMenu()
 {
-	if (menuClass != nullptr)
+	if (MenuClass != nullptr)
 	{
-		mainMenu = CreateWidget<UMainMenu>(this, menuClass, _T("MenuClass"));
+		MainMenu = CreateWidget<UMainMenu>(this, MenuClass, _T("MenuClass"));
 
-		if (mainMenu != nullptr)
-			mainMenu->Activate(this);
+		if (MainMenu != nullptr)
+			MainMenu->Activate(this);
 	}
 }
 
 void UPuzzlePlatformsGameInstance::LoadInGameMenu()
 {
-	if (inGameMenuClass != nullptr)
-		inGameMenu = CreateWidget<UInGameMenu>(this, inGameMenuClass, _T("InGameMenuClass"));
+	if (InGameMenuClass != nullptr)
+		InGameMenu = CreateWidget<UInGameMenu>(this, InGameMenuClass, _T("InGameMenuClass"));
 }
 
-void UPuzzlePlatformsGameInstance::Host(const FText& lobbyName)
+void UPuzzlePlatformsGameInstance::Host(const FText& LobbyName)
 {
-	if (sessionInterface.IsValid() == true)
+	if (SessionInterface.IsValid() == true)
 	{
-		auto* ExistingSession = sessionInterface->GetNamedSession(*lobbyName.ToString());
+		auto* ExistingSession = SessionInterface->GetNamedSession(*LobbyName.ToString());
 
 		if (ExistingSession != nullptr)
 		{
@@ -93,32 +91,40 @@ void UPuzzlePlatformsGameInstance::Host(const FText& lobbyName)
 					CreateSession(sessionName);
 				});
 
-			sessionInterface->DestroySession(*lobbyName.ToString(), destroyDelegate);
+			SessionInterface->DestroySession(*LobbyName.ToString(), destroyDelegate);
 		}
 		else
 		{
-			CreateSession(*lobbyName.ToString());
+			CreateSession(*LobbyName.ToString());
 		}
 	}
 }
 
-void UPuzzlePlatformsGameInstance::Join(uint32 index)
+void UPuzzlePlatformsGameInstance::Join(uint32 Index)
 {
-	if (sessionInterface.IsValid() != true || sessionSearch.IsValid() != true)
+	if (SessionInterface.IsValid() != true || SessionSearch.IsValid() != true)
 		return;
 
-	sessionInterface->JoinSession(0, SESSION_NAME, sessionSearch->SearchResults[index]);
+	SessionInterface->JoinSession(0, SETTING_GAME_SESSION_URI, SessionSearch->SearchResults[Index]);
+}
+
+void UPuzzlePlatformsGameInstance::StartSession()
+{
+	if (SessionInterface.IsValid() == true)
+	{
+		SessionInterface->StartSession(NAME_GameSession);
+	}
 }
 
 void UPuzzlePlatformsGameInstance::RefreshServerList()
 {
-	if (sessionSearch.IsValid() == true)
+	if (SessionSearch.IsValid() == true)
 	{
 		//sessionSearch->bIsLanQuery = true;
-		sessionSearch->MaxSearchResults = 100;
-		sessionSearch->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
+		SessionSearch->MaxSearchResults = 100;
+		SessionSearch->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
 
-		sessionInterface->FindSessions(0, sessionSearch.ToSharedRef());
+		SessionInterface->FindSessions(0, SessionSearch.ToSharedRef());
 	}
 }
 
@@ -128,8 +134,8 @@ void UPuzzlePlatformsGameInstance::OpenInGameMenu()
 	{
 		GEngine->AddOnScreenDebugMessage(0, 2.0f, FColor::Green, _T("Open In Game Menu"));
 
-		if (inGameMenu != nullptr)
-			inGameMenu->Activate(this);
+		if (InGameMenu != nullptr)
+			InGameMenu->Activate(this);
 	}
 }
 
@@ -159,38 +165,38 @@ void UPuzzlePlatformsGameInstance::QuitGame()
 	}
 }
 
-void UPuzzlePlatformsGameInstance::OnCreateSessionComplete(FName sessionName, bool isSuccess)
+void UPuzzlePlatformsGameInstance::OnCreateSessionComplete(FName SessionName, bool bIsSuccess)
 {
-	if (isSuccess != true)
+	if (bIsSuccess != true)
 		return;
 
 	if (GEngine != nullptr)
 	{
 		GEngine->AddOnScreenDebugMessage(0, 2.0f, FColor::Green, _T("Hosting"));
 
-		UE_LOG(LogTemp, Warning, _T("Create %s Session"), *sessionName.ToString());
+		UE_LOG(LogTemp, Warning, _T("Create %s Session"), *SessionName.ToString());
 
 		if (GWorld != nullptr)
-			GWorld->ServerTravel("/Game/ThirdPerson/Maps/ThirdPersonMap?listen");
+			GWorld->ServerTravel("/Game/PuzzlePlatforms/Maps/Lobby?listen");
 	}
 }
 
-void UPuzzlePlatformsGameInstance::OnDestroySessionComplete(FName sessionName, bool isSuccess)
+void UPuzzlePlatformsGameInstance::OnDestroySessionComplete(FName SessionName, bool bIsSuccess)
 {
 
 }
 
-void UPuzzlePlatformsGameInstance::OnFindSessionsComplete(bool isSuccess)
+void UPuzzlePlatformsGameInstance::OnFindSessionsComplete(bool bIsSuccess)
 {
-	if (isSuccess == true && sessionSearch.IsValid() == true)
+	if (bIsSuccess == true && SessionSearch.IsValid() == true)
 	{
 		UE_LOG(LogTemp, Warning, _T("Found Session"));
 
-		if (mainMenu != nullptr)
+		if (MainMenu != nullptr)
 		{
-			mainMenu->ClearServerList();
+			MainMenu->ClearServerList();
 
-			for (auto& result : sessionSearch->SearchResults)
+			for (auto& result : SessionSearch->SearchResults)
 			{
 				FServerData data;
 
@@ -205,7 +211,7 @@ void UPuzzlePlatformsGameInstance::OnFindSessionsComplete(bool isSuccess)
 					data.name = *userData;
 				}
 
-				mainMenu->AddServerRow(data);
+				MainMenu->AddServerRow(data);
 			}
 		}
 	}
@@ -215,13 +221,13 @@ void UPuzzlePlatformsGameInstance::OnFindSessionsComplete(bool isSuccess)
 	}
 }
 
-void UPuzzlePlatformsGameInstance::OnJoinSessionComplete(FName sessionName, EOnJoinSessionCompleteResult::Type result)
+void UPuzzlePlatformsGameInstance::OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result)
 {
-	if (sessionInterface.IsValid() == true)
+	if (SessionInterface.IsValid() == true)
 	{
 		FString connectInfo;
 
-		if (sessionInterface->GetResolvedConnectString(sessionName, connectInfo) != true)
+		if (SessionInterface->GetResolvedConnectString(SessionName, connectInfo) != true)
 			return;
 
 		UE_LOG(LogTemp, Warning, _T("%s"), *connectInfo);
@@ -233,9 +239,9 @@ void UPuzzlePlatformsGameInstance::OnJoinSessionComplete(FName sessionName, EOnJ
 	}
 }
 
-void UPuzzlePlatformsGameInstance::CreateSession(FName sessionName)
+void UPuzzlePlatformsGameInstance::CreateSession(FName SessionName)
 {
-	if (sessionInterface.IsValid() == true)
+	if (SessionInterface.IsValid() == true)
 	{
 		auto* oss = IOnlineSubsystem::Get();
 
@@ -244,10 +250,10 @@ void UPuzzlePlatformsGameInstance::CreateSession(FName sessionName)
 		sessionSettings.bIsLANMatch = oss->GetSubsystemName() == "NULL";
 		sessionSettings.bUsesPresence = true;
 		sessionSettings.bShouldAdvertise = true;
-		sessionSettings.NumPublicConnections = 2;
+		sessionSettings.NumPublicConnections = 5;
 		sessionSettings.bUseLobbiesIfAvailable = true;
-		sessionSettings.Set(_T("LobbyName"), sessionName.ToString(), EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
-
-		sessionInterface->CreateSession(0, sessionName, sessionSettings);
+		sessionSettings.Set(_T("LobbyName"), SessionName.ToString(), EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
+		
+		SessionInterface->CreateSession(0, NAME_GameSession, sessionSettings);
 	}
 }

@@ -46,7 +46,7 @@ void UMainMenu::Deactivate()
 {
 	menuInterface = nullptr;
 
-	RemoveFromViewport();
+	RemoveFromParent();
 
 	auto* playerController = GetWorld()->GetFirstPlayerController();
 
@@ -177,6 +177,8 @@ void UMainMenu::OpenHostMenu()
 {
 	if (menuSwitcher != nullptr)
 	{
+		ClearServerList();
+		
 		if (hostMenu != nullptr)
 			menuSwitcher->SetActiveWidget(hostMenu);
 	}

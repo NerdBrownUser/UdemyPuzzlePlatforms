@@ -31,7 +31,7 @@ void UInGameMenu::Deactivate()
 {
 	menuInterface = nullptr;
 
-	RemoveFromViewport();
+	RemoveFromParent();
 
 	auto* playerController = GetWorld()->GetFirstPlayerController();
 

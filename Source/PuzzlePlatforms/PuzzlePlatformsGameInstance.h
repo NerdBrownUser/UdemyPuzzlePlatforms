@@ -17,20 +17,24 @@ class PUZZLEPLATFORMS_API UPuzzlePlatformsGameInstance : public UGameInstance, p
 	GENERATED_BODY()
 
 private:
-	TSubclassOf<class UMainMenu> menuClass;
-	class UMainMenu* mainMenu;
+	TSubclassOf<class UMainMenu> MenuClass;
 
-	TSubclassOf<class UInGameMenu> inGameMenuClass;
-	class UInGameMenu* inGameMenu;
+	UPROPERTY()
+	class UMainMenu* MainMenu;
 
-	IOnlineSessionPtr sessionInterface;
+	TSubclassOf<class UInGameMenu> InGameMenuClass;
 
-	TSharedPtr<FOnlineSessionSearch> sessionSearch;
+	UPROPERTY()
+	class UInGameMenu* InGameMenu;
+
+	IOnlineSessionPtr SessionInterface;
+
+	TSharedPtr<FOnlineSessionSearch> SessionSearch;
 
 public:
 	UPuzzlePlatformsGameInstance(const FObjectInitializer& ObjectInitializer);
 
-	void Init() override;
+	virtual void Init() override;
 
 	UFUNCTION(BlueprintCallable)
 	void LoadMainMenu();
@@ -38,25 +42,27 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void LoadInGameMenu();
 
-	void Host(const FText& lobbyName) override;
+	virtual void Host(const FText& LobbyName) override;
 
-	void Join(uint32 index) override;
+	virtual void Join(uint32 Index) override;
 
-	void RefreshServerList() override;
+	void StartSession();
+	
+	virtual void RefreshServerList() override;
 
 	UFUNCTION(BlueprintCallable)
 	void OpenInGameMenu();
 
-	UFUNCTION(Exec)
-	void Leave() override;
+	UFUNCTION()
+	virtual void Leave() override;
 
-	UFUNCTION(Exec)
-	void QuitGame() override;
+	UFUNCTION()
+	virtual void QuitGame() override;
 
-	void OnCreateSessionComplete(FName sessionName, bool isSuccess);
-	void OnDestroySessionComplete(FName sessionName, bool isSuccess);
-	void OnFindSessionsComplete(bool isSuccess);
-	void OnJoinSessionComplete(FName sessionName, EOnJoinSessionCompleteResult::Type result);
+	void OnCreateSessionComplete(FName SessionName, bool bIsSuccess);
+	void OnDestroySessionComplete(FName SessionName, bool bIsSuccess);
+	void OnFindSessionsComplete(bool bIsSuccess);
+	void OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
 
-	void CreateSession(FName sessionName);
+	void CreateSession(FName SessionName);
 };
